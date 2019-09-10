@@ -1,0 +1,102 @@
+<aura:component controller="feedcreatorcontrol">
+    
+    <aura:attribute name="RecordId" type="Id"/>
+    <aura:attribute name="today" type="Date" />
+    <aura:attribute name="Comments" type="PComment__c[]"/>
+    <aura:attribute name="daComm" type="String"/>
+    <aura:attribute name="newComment" type="PComment__c"
+         default="{ 'sobjectType': 'PComment__c',
+                  		'Date':'',
+                  		'Comment__c':''}"/>  
+    
+    <aura:handler name="init" action="{!c.init}" value="{!this}" />
+    
+    
+    <aura:attribute name="isModalOpen" type="boolean" default="false"/>
+
+    
+    <aura:if isTrue="{!v.isModalOpen}">
+		<section role="dialog" tabindex="-1"
+                     aria-labelledby="modal-heading-01"
+                     aria-modal="true"
+                     aria-describedby="modal-content-id-1"
+                     class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModel }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Create comment</h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <form class="slds-form--stacked">
+							<lightning:inputRichText value="{!v.newComment.Comment__c}" placeholder="Type something interesting"/>                        </form>
+                    </div>
+                    <!--Modal/Popup Box Footer Starts here-->
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="neutral"
+                                          label="Cancel"
+                                          title="Cancel"
+                                          onclick="{! c.closeModel }"/>
+                        <lightning:button variant="brand"
+                                          label="OK"
+                                          title="OK"
+                                          onclick="{!c.submitDetails}"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+    
+    <div style="margin-left:10px">
+    	<lightning:button variant="Brand" label="Write Comment" onclick="{!c.openModel}"/>
+    </div>
+	
+    
+	<aura:if isTrue="{!v.Comments.length == 0}">
+        There is no comment yet
+        <aura:set attribute="else">
+            <aura:iteration items="{!v.Comments}" var="comment">
+                <div class="slds-feed">
+                  <ul class="slds-feed__list">
+                    <li class="slds-feed__item">
+                      <article class="slds-post">
+                        <header class="slds-post__header slds-media">
+                          <div class="slds-media__figure">
+                            <a href="javascript:void(0);" class="slds-avatar slds-avatar_circle slds-avatar_large">
+                              <img alt="Jason Rodgers" src="https://upload.wikimedia.org/wikipedia/commons/0/0c/Cow_female_black_white.jpg" title="Jason Rodgers avatar" />
+                            </a>
+                          </div>
+                          <div class="slds-media__body">
+                            <div class="slds-grid slds-grid_align-spread slds-has-flexi-truncate">
+                              <p>
+                                <a href="javascript:void(0);" title="{!comment.User__r.Name}">{!comment.User__r.Name}</a>
+                              </p>
+                            </div>
+                            <p class="slds-text-body_small">
+                              <a href="javascript:void(0);" title="Click for single-item view of this post" class="slds-text-link_reset">{!comment.Date__c}</a>
+                            </p>
+                          </div>
+                        </header>
+                        <div class="slds-post__content slds-text-longform">
+                          <lightning:formattedRichText value="{!comment.Comment__c}" />
+                        </div>
+                        <footer class="slds-post__footer">
+                          <ul class="slds-post__footer-actions-list slds-list_horizontal">
+                            
+                          </ul>
+                        </footer>
+                      </article>
+                    </li>
+                  </ul>
+                </div>
+            </aura:iteration>
+        </aura:set>
+        
+    </aura:if>
+    
+</aura:component>

@@ -1,0 +1,21 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId"
+                access="global" 
+                controller="CalendarController2">
+    <ltng:require scripts="{!join(',',
+                           $Resource.Calendar390 + '/fullcalendar-3.9.0/lib/moment.min.js',
+                           $Resource.Calendar390 + '/fullcalendar-3.9.0/lib/jquery.min.js',
+                           $Resource.Calendar390 + '/fullcalendar-3.9.0/lib/jquery-ui.min.js',
+                           $Resource.Calendar390 + '/fullcalendar-3.9.0/fullcalendar.min.js'
+                           )}"
+                  styles="{!$Resource.Calendar390 + '/fullcalendar-3.9.0/fullcalendar.min.css'}"
+                  afterScriptsLoaded="{!c.afterScriptsLoaded}" />
+    
+    <aura:attribute name="recordId" type="Id"/>
+    
+    <ui:scrollerWrapper class="scrollerSize">
+    	<div id='calendar2'></div>
+    </ui:scrollerWrapper>
+    
+    <lightning:button label="New Event" variant="brand" onclick="{!c.newEvent}"/>
+    
+</aura:component>

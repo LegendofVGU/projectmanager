@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>task_end_date</fullName>
+    <active>true</active>
+    <description>task end date cant be greater than project end date</description>
+    <errorConditionFormula>End_Date__c &gt;  Project__r.End_Date__c</errorConditionFormula>
+    <errorMessage>Task end date is greater than project end date</errorMessage>
+</ValidationRule>

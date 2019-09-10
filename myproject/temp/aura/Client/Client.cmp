@@ -1,0 +1,77 @@
+<aura:component implements="force:hasRecordId" controller="ClientController2">
+	
+    <aura:attribute name="RecordId" type="Id"/>
+    <aura:attribute name="project" type="Project__c"/>
+    <aura:attribute name="daClient" type="Contact[]"/>
+    <aura:attribute name="error" type="String"/>
+    <aura:attribute name="parent" type="Aura.Component" required="true"/>
+    <aura:attribute name="contact" type="Contact"
+    default="{
+        'SObjectType': 'Contact',
+        'FirstName': '',
+        'LastName': '',
+        'Email': '',
+        'Phone': ''
+     }"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <!-- If there is no client yet, create a client -->
+    <aura:if isTrue="{!v.project.Client__c == null}">
+        <div style="margin-left:10px">
+            It looks like this project's client contact haven't been declared.<br/>
+            <lightning:button label="Add Client" onclick="{!c.openModal}"/>
+        </div>
+        <aura:set attribute="else">
+            <div style="margin-left:10px">
+              <lightning:layout>
+                  <lightning:layoutItem size="6">
+                  	First Name: {!v.project.Client__r.FirstName}
+                  </lightning:layoutItem>
+                  <lightning:layoutItem size="6">
+                  	Last Name: {!v.project.Client__r.LastName}
+                  </lightning:layoutItem>
+              </lightning:layout>
+            <lightning:layout>
+                  <lightning:layoutItem size="6">
+                  	Email: {!v.project.Client__r.Email}
+                  </lightning:layoutItem>
+                  <lightning:layoutItem size="6">
+                  	Phone: {!v.project.Client__r.Phone}
+                  </lightning:layoutItem>
+              </lightning:layout>
+                <lightning:button label="Delete" onclick="{!c.dodelete}"/>
+            </div>
+        </aura:set>
+    </aura:if>
+    
+    <div>
+        <!--dialog to create new client-->
+        <section aura:id="contactModal" role="dialog" tabindex="-1" aria-labelledby="contactModalHeading" aria-modal="true" aria-describedby="contactModalBody" class="slds-modal">
+            <!-- Modal Container -->
+            <div class="slds-modal__container">
+                <!-- Modal Header ( consists of close button and heading of modal ) -->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon class="slds-modal__close" alternativeText="Close" iconName="utility:close" onclick="{!c.closeModal}" variant="bare-inverse" size="large"></lightning:buttonIcon>
+                    <h2 id="contactModalHeading" class="slds-text-heading_medium slds-hyphenate">New Contact</h2>
+                </header>
+                <!-- Modal Body ( consists of form ) -->
+                <div class="slds-modal__content slds-p-around_medium" id="contactModalBody">
+                    {!v.clicked}<br/>
+                    First Name: <lightning:input label="First Name" value="{!v.contact.FirstName}" />
+                    Last Name: <lightning:input label="Last Name" required="true" value="{!v.contact.LastName}" />
+                    Email: <lightning:input label="Email" value="{!v.contact.Email}" />
+                    Phone: <lightning:input label="Phone" value="{!v.contact.Phone}" />
+                </div>
+                <!-- Modal Footer ( consists of cancel and save buttons ) -->
+                <footer class="slds-modal__footer">
+                    <lightning:button onclick="{!c.closeModal}" variant="neutral">Cancel</lightning:button>
+                    <lightning:button onclick="{!c.createContact}" variant="brand" >Save</lightning:button>
+                </footer>
+            </div>
+        </section>
+        <!-- Modal Backdrop -->
+        <div aura:id="contactModalBackdrop" class="slds-backdrop"></div>
+    </div>
+    
+</aura:component>

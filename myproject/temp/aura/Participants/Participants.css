@@ -1,0 +1,9 @@
+.THIS {
+}
+.THIS .changeMe {
+    cursor:pointer;
+}
+.THIS .buttonsize svg {
+    width: 30px;
+    height: 30px;
+}

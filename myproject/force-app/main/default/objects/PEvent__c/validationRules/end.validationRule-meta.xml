@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>end</fullName>
+    <active>true</active>
+    <errorConditionFormula>Date__c &gt; Project__r.End_Date__c</errorConditionFormula>
+    <errorMessage>Date must be within project&#39;s duration</errorMessage>
+</ValidationRule>

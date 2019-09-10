@@ -1,0 +1,105 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="TableController">
+    
+    <!-- Setting table data -->
+    <aura:attribute name="data" type="Project__c[]"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="total" type="Integer"/>
+    
+    <!-- Set combobox -->
+    <aura:attribute name="options" type="List" default="[]"/>
+    <aura:attribute name="cboxvalue" type="String" default=""/>
+    <aura:attribute name="lstIds" type="Id[]"/>
+    
+    <!-- Modal Stuff -->
+    <aura:attribute name="isModalOpen" type="boolean" default="false"/>
+
+    
+    <!-- For pagination -->
+    <aura:attribute name="PaginationList" type="Project__c[]"/>
+    <aura:attribute name="startPage" type="Integer" />
+    <aura:attribute name="endPage" type="Integer"/>
+    <aura:attribute name="totalRecords" type="Integer"/>
+    <aura:attribute name="pageSize" type="Integer" default="10"/>
+    
+    <!-- Do init action on start -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    
+    <!-- Modal Section -->
+    <aura:if isTrue="{!v.isModalOpen}">
+    	<section role="dialog" tabindex="-1"
+                     aria-labelledby="modal-heading-01"
+                     aria-modal="true"
+                     aria-describedby="modal-content-id-1"
+                     class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModel }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!v.selectedPar.Name}</h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                            <lightning:combobox name="progress" label="Select a management type" value="" placeholder="Select Progress" options="{! v.options }" onchange="{! c.handleChange }"/>
+                        <br/><br/><br/><br/><br/><br/>
+                    </div>
+                    <!--Modal/Popup Box Footer Starts here-->
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="neutral"
+                                          label="Cancel"
+                                          title="Cancel"
+                                          onclick="{! c.closeModel }"/>
+                        <lightning:button variant="brand"
+                                          label="OK"
+                                          title="OK"
+                                          onclick="{!c.submitDetails}"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    
+	<lightning:card>
+        <lightning:tabset>
+            <!-- Define projects tab -->
+            <lightning:tab label="Projects" id="one">
+                Total amount: {!v.total}<br/><!-- Show total number of projects -->
+                <!-- datatable start -->
+                <lightning:datatable data="{!v.PaginationList}" 
+                columns="{!v.columns}" 
+                keyField="id"
+                hideCheckboxColumn="true"                     
+                />
+                
+                <div class="margin-top:10px">
+                    <!-- Pagination -->
+                    <lightning:buttonGroup >
+                        <lightning:button label="Prev" disabled="{!v.startPage == 0}"  
+                                          onclick="{!c.previous}" variant="brand"
+                                          iconName='utility:back'/>
+                        &nbsp; &nbsp; &nbsp;
+                        <lightning:button label="Next" disabled="{!v.endPage >= v.totalRecords}" 
+                                          onclick="{!c.next}" variant="brand"
+                                          iconName='utility:forward' iconPosition='right'/>
+                        &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
+						
+                    </lightning:buttonGroup>
+                    <div class="slds-float_right">
+                			<lightning:button label="New" onclick="{!c.openModel}"/>	
+                        </div>
+                </div>
+            </lightning:tab>
+            
+            <!-- Start of calendar tab -->
+            <lightning:tab label="Calendar" id="two">
+                <c:Calendar/>
+        	</lightning:tab>
+            
+        </lightning:tabset>
+    </lightning:card>
+    
+</aura:component>

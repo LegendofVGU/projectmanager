@@ -1,0 +1,37 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+
+    <aura:attribute name="record" type="Object"
+                    description="The record object to be displayed"/>
+    <aura:attribute name="OpptyRecord" type="Object"
+                    description="A simplified view record object to be displayed"/>
+    <aura:attribute name="recordError" type="String"
+                    description="An error message bound to force:recordData"/>
+
+    <force:recordData aura:id="record"
+                      layoutType="FULL"
+                      recordId="{!v.recordId}"
+                      targetError="{!v.recordError}"
+                      targetRecord="{!v.record}"
+                      targetFields="{!v.OpptyRecord }"
+                      recordUpdated="{!c.init}"
+                      mode="VIEW"/>
+    
+    <aura:attribute name="mapMarkers" type="Object"/>
+    <aura:attribute name="center" type="Object" />
+    <aura:attribute name="zoomLevel" type="Integer" />
+    <aura:attribute name="markersTitle" type="String" />
+    <aura:attribute name="showFooter" type="Boolean" />
+
+    <!-- handlers-->
+
+    <!-- the map component -->
+     <aura:if isTrue="{!v.mapMarkers.length > 0}" >
+    <lightning:map
+        mapMarkers="{! v.mapMarkers }"
+        center="{! v.center }"
+        zoomLevel="{! v.zoomLevel }"
+        markersTitle="{! v.markersTitle }"
+        showFooter="{ !v.showFooter }" >
+    </lightning:map>
+    </aura:if>
+</aura:component>

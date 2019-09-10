@@ -1,0 +1,79 @@
+<aura:component controller="TaskCreatorControl">
+    
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="participants" type="Participant__c[]"/>
+    <aura:attribute name="Sprints" type="Sprint_Item__c[]"/>
+    <aura:attribute name="selectedValue" type="Id"/>
+    <aura:attribute name="participantOptions" type="Object[]" />
+    <aura:attribute name="error" type="String"/>
+    
+    <aura:attribute name="parent" type="Aura.Component" required="true"/>
+    
+	<aura:attribute name="newTask" type="Task__c"
+         default="{ 'sobjectType': 'Task__c',
+                        'Name': '',
+                  		'Description__c': '',
+                  		'Priority':'Low'}"/>    
+    
+    <aura:attribute name="isModalOpen" type="boolean" default="false"/>
+    
+    <!-- almost same as TaskCreator except missing date fields-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    
+    <lightning:button variant="brand" label="New Task" onclick="{!c.openModel}"/>
+    
+    <aura:if isTrue="{!v.isModalOpen}">
+		<section role="dialog" tabindex="-1"
+                     aria-labelledby="modal-heading-01"
+                     aria-modal="true"
+                     aria-describedby="modal-content-id-1"
+                     class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModel }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Create a Task</h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <form class="slds-form--stacked">
+                            <div style="color:red">
+                            	{!v.error}
+                            </div>
+                            <lightning:input aura:id="newtask" label="Task Name"
+                             name="expensename"
+                             value="{!v.newTask.Name}"
+                             required="true"/> 
+                            <lightning:select aura:id="newt" name="mySelect" label="Select participant: " value="{!v.newTask.Participant__c}">
+                                <aura:iteration items="{!v.participants}" var="par">
+                                    <option text="{!par.User__r.Name}" value="{!par.Id}" />
+                                </aura:iteration>
+                            </lightning:select>
+                            <lightning:select name="mySelect3" label="Select Priority: " value="{!v.newTask.Priority__c}">
+                                <option value="Low">Low</option>
+                                <option value="Normal">Normal</option>
+                                <option value="High">High</option>
+                            </lightning:select>  
+                        </form>
+                    </div>
+                    <!--Modal/Popup Box Footer Starts here-->
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="neutral"
+                                          label="Cancel"
+                                          title="Cancel"
+                                          onclick="{! c.closeModel }"/>
+                        <lightning:button variant="brand"
+                                          label="OK"
+                                          title="OK"
+                                          onclick="{!c.submitDetails}"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+</aura:component>

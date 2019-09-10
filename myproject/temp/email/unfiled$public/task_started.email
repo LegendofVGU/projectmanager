@@ -1,0 +1,1 @@
+A task with name {!Task__c.Name} has started!! Please finish it before the due date {!Task__c.End_Date__c}.month() / {!Task__c.End_Date__c}.day()

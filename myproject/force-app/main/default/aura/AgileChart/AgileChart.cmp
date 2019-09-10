@@ -1,0 +1,11 @@
+<aura:component >
+    <ltng:require scripts="{!$Resource.chartminjs}"
+                  styles="{!$Resource.chartmincss}"
+                  afterScriptsLoaded="{!c.scriptsLoaded}" />
+    
+    <aura:attribute name="Sprints" type="Sprint__c[]"/>
+    
+    This is where the chart is
+    
+    <canvas id="pie-chart" width="950" height="250"></canvas>
+</aura:component>

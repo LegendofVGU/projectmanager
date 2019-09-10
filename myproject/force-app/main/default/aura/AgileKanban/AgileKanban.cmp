@@ -1,0 +1,259 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId"
+                access="global" controller="AgileKanbanController2">
+	
+    <aura:attribute name="Tasks" type="Task__c[]"/>
+    <aura:attribute name="selectedTask" type="Task__c"/>
+    <aura:attribute name="participants" type="Participant__c[]"/>
+    <aura:attribute name="Sprints" type="Sprint__c[]"/>
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="dragging" type="Boolean" default="false"/>
+    <aura:attribute name="isModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="Status" type="String[]" default="['Not Started','In Progress','Completed','Waiting on someone else','Deferred']"/>
+    <aura:attribute name="lstsize" type="Integer"/>
+    <aura:attribute name="activeSprint" type="Sprint__c"/>
+    <aura:attribute name="inactiveSprints" type="Sprint__c[]"/>
+    <aura:attribute name="relatedFollowups" type="Task_Followup__c[]"/>
+    <aura:attribute name="parent" type="Aura.Component" required="true"/>
+
+    
+    <aura:attribute name="test" type="String"/>
+    
+    <!-- refresh2 only reset sprints, reset reset everything-->
+    <aura:method name="refresh" action="{!c.callParentRefresh}"/>
+    <aura:method name="refresh2" action="{!c.doInit}"/>
+
+    
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:registerEvent name="cmpEvent" type="c:ceEvent"/>
+    <aura:handler name="cmpEvent" event="c:ceEvent" action="{!c.doInit}"/>
+
+
+    
+    <div class="slds-m-around_xx-large">
+        <aura:if isTrue="{!v.isModalOpen}">
+             
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1"
+                     aria-labelledby="modal-heading-01"
+                     aria-modal="true"
+                     aria-describedby="modal-content-id-1"
+                     class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModel }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!v.selectedTask.Name}</h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <p style="background-color: AliceBlue; margin-left: 1px"><b>Details: <br/>
+                            </b>
+                        </p>
+                        
+                        <div style="margin-left: 7px">
+                            <lightning:recordEditForm
+                            recordId="{!v.selectedTask.Id}"
+                            objectApiName="Task__c"
+                            onsubmit="{!c.handleSubmit}"
+                            onsuccess="{!c.doInit}"
+                            onError="{!c.handleError}">
+                            <!-- the messages component is for error messages -->
+                            <lightning:messages />
+                                {!v.recordError}
+                
+                            <lightning:inputField fieldName="Name" />
+                            <lightning:select name="mySelect" label="Participant: " value="{!v.selectedTask.Participant__c}">
+                                <aura:iteration items="{!v.participants}" var="par">
+                                    <option text="{!par.User__r.Name}" value="{!par.Id}" />
+                                </aura:iteration>
+                            </lightning:select>  
+                            <lightning:inputField fieldName="Description__c" />
+                        <lightning:button variant="neutral"
+                                          label="Cancel"
+                                          title="Cancel"
+                                          onclick="{! c.closeModel }"/>
+                        <lightning:button variant="destructive"
+                                          label="Delete"
+                                          title="Delete"
+                                          onclick="{! c.handleDeleteRecord }"/>                                
+                        <lightning:button variant="brand" type="submit" name="save" label="Save" />
+                        </lightning:recordEditForm>
+                            
+                        </div>
+                    </div>
+                    <!--Modal/Popup Box Footer Starts here-->
+                    <footer class="slds-modal__footer">
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+    </div>
+    
+    <lightning:card class="card slds-scrollable_x">
+        <lightning:tabset>
+            <lightning:tab label="Active Sprint" id="one">
+            <div style="padding:0.5rem;">
+                <aura:if isTrue="{!v.activeSprint != null}">
+                    <!--Show info on currently active sprint -->
+                -Currently active sprint: {!v.activeSprint.Name}
+                <lightning:layout>
+                <aura:iteration var="status" items="{!v.Status}" indexVar="Idx">
+                        <lightning:layoutItem>
+                    <div class="stageContainer">
+                        <div class="" style="font-weight:bold; margin-left: 10px; margin-top: 10px; margin-right: 10px">
+                            <h1>{!status}</h1>
+                        </div>
+                        
+                        <!-- Draggable components, ul = drop zone-->
+                        <ul ondrop="{!c.drop}" 
+                            ondragover="{!c.allowDrop}" 
+                            class="slds-has-dividers_around-space dropZone" 
+                            data-Pick-Val="{!status}" style="height:40vh;overflow-y:auto;"
+                            onmouserover="{!c.hover}">
+                            <aura:iteration items="{!v.Tasks}" var="task">
+                                <aura:if isTrue="{!and(task.Sprint__c == v.activeSprint.Id,task.Status__c == status)}"> <!-- Gonna be sprint -->
+                                    <li class="slds-m-around_small" 
+                                        draggable="true" 
+                                        ondragstart="{!c.drag}" id="{!task.Id}"
+                                        onmouseover="{!c.hover}">
+                                        <div data-taskid="{!task.Id}"
+                                             onclick="{!c.openModel}">
+                                            <lightning:button aura:id="{!task.Id}"
+                                                              class="slds-button_stretch">
+                                                <lightning:layout>
+                                                    <lightning:layoutItem size="3">
+                                                    <img style="margin-top: 10px"
+                                                         src="{!task.Participant__r.User__r.MediumPhotoUrl}"
+                                                         width="30" height="30"/>
+                                                    </lightning:layoutItem>
+                                                    <lightning:layoutItem size="6">
+                                                <h3 class="slds-truncate" style="float:left;color:black"
+                                                    title="{!task.Name}">
+                                                    <p style="{!task.Overdue__c ? 'color:red' : ''}">{!task.Name}</p>
+                                                </h3>
+                                                <!--<lightning:button label="nanana" onclick="{!c.Click2}"></lightning:button>-->
+                                                <br/>
+                                                <p style="float:left;color:black">
+                                                    Priority: 
+                                                    <aura:if isTrue="{!task.Priority__c == 'Low'}">
+                                                        <p style="float:right;color:green"> {!task.Priority__c} </p>
+                                                        <aura:set attribute="else">
+                                                            <aura:if isTrue="{!task.Priority__c == 'Medium'}">
+                                                                <p style="float:right;color:orange"> {!task.Priority__c} </p>
+                                                                <aura:set attribute="else">
+                                                                    <p style="float:right;color:red"> {!task.Priority__c} </p>
+                                                                </aura:set>
+                                                            </aura:if>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </p>
+                                                        
+                                                    </lightning:layoutItem>
+                                                </lightning:layout>
+                                            </lightning:button>
+                                        </div>
+                                    </li>
+                                </aura:if>
+                            </aura:iteration>
+                        </ul>
+                                <!--<lightning:button class="slds-button_stretch"
+                                              variant="base" label="Add"
+                                              onclick="{!v.showStat}"/>-->
+                    </div>
+                        </lightning:layoutItem>
+                </aura:iteration>
+                </lightning:layout>
+                    <div style="margin-top: 10px">
+                        <lightning:button variant="brand" label="Complete Sprint" onclick="{!c.completeSprint}"/>
+                    </div>
+                    
+                    <aura:set attribute="else">
+                        There is no currently active sprint.
+                    </aura:set>
+                    
+                </aura:if>
+            </div>
+            </lightning:tab>
+            
+            
+            <lightning:tab label="Calendar">
+                <c:Calendar2 recordId="{!v.recordId}"/>
+            </lightning:tab>
+            
+            <lightning:tab label="Chart" id="four">
+                <c:AgileChart Sprints="{!v.Sprints}"/>
+            </lightning:tab>
+            
+            
+            <lightning:tab label="Backlog" id="three">
+                <div style="margin-left:10px; margin-right:10px">
+                    <div class="" style="font-weight:bold; margin-left: 10px; margin-top: 10px; margin-right: 10px">
+                        <h1>Sprints</h1><br/>
+                    </div>
+                    <div style="margin-bottom: 10px">
+                    	You can activate the next sprint if there is no active sprint
+                    </div>
+                    <aura:iteration items="{!v.inactiveSprints}" var="sprint" indexVar="sprintIdx">
+                            <div style="margin-bottom:10px">
+                                <div class="slds-box">
+                                    <div class="slds-clearfix">
+                                        {!sprint.Name} - {!sprint.Status__c}
+                                        <div class="slds-float_right">
+                                            <aura:if isTrue="{!and(sprintIdx == 0,v.activeSprint == null)}">
+                                                <c:SprintActivator parent="{!this}" sprint="{!sprint}"/>
+                                            </aura:if>
+                                        </div>
+                                        <ul ondrop="{!c.drop2}" 
+                                            ondragover="{!c.allowDrop}" 
+                                            class="slds-has-dividers_around-space dropZone" 
+                                            data-Pick-Val="{!sprint.Id}">
+                                            Tasks:
+                                            <aura:iteration items="{!v.Tasks}" var="task">
+                                            	<aura:if isTrue="{!task.Sprint__c == sprint.Id}">
+                                                    <li class="slds-m-around_small" 
+                                                        draggable="true" 
+                                                        ondragstart="{!c.drag2}" id="{!task.Id}"
+                                                        onmouseover="{!c.hover}">
+                                                        <lightning:button variant="Neutral" label="{!task.Name}"/><br/>
+                                                    </li>
+                                                </aura:if>
+                                            </aura:iteration>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                    </aura:iteration>
+                    <div class="" style="font-weight:bold; margin-left: 10px; margin-top: 10px; margin-right: 10px">
+                        <h1>Tasks</h1><br/>
+                    </div>
+                    <aura:iteration items="{!v.Tasks}" var="task">
+                        <ul ondrop="{!c.drop2}" 
+                            class="slds-has-dividers_around-space dropZone" 
+                            ondragover="{!c.allowDrop}"
+                            data-Pick-Val="">
+                            <aura:if isTrue="{!task.Sprint__c == null}">
+                                <li class="slds-m-around_small" 
+                                            draggable="true" 
+                                            ondragstart="{!c.drag2}" id="{!task.Id}"
+                                            onmouseover="{!c.hover}">
+                                    <lightning:button variant="Neutral" label="{!task.Name}"/><br/>
+                                </li>
+                            </aura:if>
+                        </ul>
+                    </aura:iteration>
+                	<c:AgileTaskCreator recordId="{!v.recordId}"
+                                        Sprints="{!v.Sprints}"
+                                        participants="{!v.participants}"
+                                        parent="{!this}"/>
+                		<lightning:button variant="brand" label="New Sprint" onclick="{!c.newSprint}"/>
+                </div>
+            </lightning:tab>
+        </lightning:tabset>
+    </lightning:card>
+    
+</aura:component>

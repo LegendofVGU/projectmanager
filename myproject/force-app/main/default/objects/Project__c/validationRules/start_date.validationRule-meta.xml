@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>start_date</fullName>
+    <active>false</active>
+    <description>Project start date cant be earlier than today</description>
+    <errorConditionFormula>Start_Date__c &lt; NOW()</errorConditionFormula>
+    <errorDisplayField>Start_Date__c</errorDisplayField>
+    <errorMessage>Start date cant be earlier than today</errorMessage>
+</ValidationRule>

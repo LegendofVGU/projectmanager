@@ -1,0 +1,38 @@
+({
+	createExpense : function(component, newTask) {
+		var action = component.get('c.insertTask');
+        var newTask = component.get('v.newTask');
+        newTask.Project__c = component.get('v.recordId');
+        //Create a new task from the Fields filled into the form
+        component.set('v.newTask',newTask)
+        action.setParams({
+            taske: component.get('v.newTask')
+        });
+        action.setCallback(this,function(response){
+            var state = response.getState();
+            if (state === "SUCCESS") {
+                var toastEvent = $A.get("e.force:showToast");
+                toastEvent.setParams({
+                    "title": "Success!",
+                    "message": "The record has been created successfully."
+                });
+                toastEvent.fire();
+                component.set('v.isModalOpen',false);
+                var p = component.get('v.parent');
+                p.refresh();
+            }
+            else if(state === "ERROR"){
+                var errors = response.getError();
+                if (errors) {
+                if (errors[0] && errors[0].message) {
+                component.set("v.error",errors[0].message );//Fetching Custom Message.
+                        }
+                }
+                else {
+                component.set("v.error", 'Request Failed!' );
+                }
+            }
+        })
+        $A.enqueueAction(action);
+	}
+})

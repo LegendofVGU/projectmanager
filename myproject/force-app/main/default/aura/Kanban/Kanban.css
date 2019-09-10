@@ -1,0 +1,27 @@
+.THIS {
+    
+} 
+.THIS .slds-item {
+    border: 1px solid #d8dde6;
+    border-radius: 0.25rem;
+    background-clip: padding-box;
+    padding: 0.45rem;
+    margin: 0.25rem;
+    background-color: white;
+}
+.THIS .stageContainer{
+    border: 2px solid #87CEFA;
+    margin: 0.3rem;
+    width: 40vh;
+    border-radius: .25rem;
+    background-color: AliceBlue;
+}
+.THIS .Container{
+    border: 2px solid #87CEFA;
+    margin: 0.3rem;
+    width: 80vh;
+    border-radius: .25rem;
+}
+.THIS .orangeColor{
+    background-color:orange !important;
+}

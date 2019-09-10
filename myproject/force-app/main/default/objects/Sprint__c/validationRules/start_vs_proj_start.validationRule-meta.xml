@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>start_vs_proj_start</fullName>
+    <active>true</active>
+    <description>Start date cant be earlier than project start date</description>
+    <errorConditionFormula>Start_Date__c &lt;  Project__r.Start_Date__c</errorConditionFormula>
+    <errorDisplayField>Start_Date__c</errorDisplayField>
+    <errorMessage>Start date cant be earlier than project start date or later than project end date</errorMessage>
+</ValidationRule>

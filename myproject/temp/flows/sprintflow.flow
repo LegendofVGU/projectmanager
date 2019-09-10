@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Change_others_to_inactive</name>
+        <label>Change others to inactive</label>
+        <locationX>379</locationX>
+        <locationY>94</locationY>
+        <actionName>SprintFlowApex</actionName>
+        <actionType>apex</actionType>
+        <inputParameters>
+            <name>Sprints</name>
+            <value>
+                <elementReference>inputsprint</elementReference>
+            </value>
+        </inputParameters>
+    </actionCalls>
+    <interviewLabel>sprintflow {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>sprintflow</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <startElementReference>Change_others_to_inactive</startElementReference>
+    <status>Active</status>
+    <variables>
+        <name>inputsprint</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Sprint__c</objectType>
+    </variables>
+</Flow>

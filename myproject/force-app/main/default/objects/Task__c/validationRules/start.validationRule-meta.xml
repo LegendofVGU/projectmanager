@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>start</fullName>
+    <active>true</active>
+    <description>start &lt; proj start</description>
+    <errorConditionFormula>Start_Date__c &lt; Project__r.Start_Date__c</errorConditionFormula>
+    <errorMessage>task start date cant be sooner than project start date</errorMessage>
+</ValidationRule>

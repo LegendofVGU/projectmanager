@@ -1,0 +1,168 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" 
+                controller="Infocontroller">
+	
+    <aura:attribute name="RecordId" type="Id"/>
+    <aura:attribute name="Project" type="Project__c"/>
+    <aura:attribute name="ProjectName" type="String"/>
+    <aura:attribute name="Status" type="String"/>
+    <aura:attribute name="SDate" type="String"/>
+    <aura:attribute name="EDate" type="String"/>
+    <aura:attribute name="ClientId" type="Id"/>
+    <aura:attribute name="Tasks" type="Task__c[]"/>
+    <aura:attribute name="incompleteTasks" type="Task__c[]"/>
+    <aura:attribute name="ContentDocuments" type="ContentDocument"/><!-- Files -->
+    <aura:attribute name="participants" type="Participant__c[]"/>
+    <aura:attribute name="Costs" type="Project_Cost__c[]"/>
+    <aura:attribute name="overdueTasks" type="Task__c[]"/>
+    <aura:attribute name="error" type="String"/>
+    
+    
+    <aura:attribute name="parent" type="Aura.Component" required="true"/>
+
+    
+    <aura:attribute name="file" type="String"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:method name="refresh" action="{!c.callP}"/><!-- Method for childs to call -->
+    
+    <lightning:card title="{!v.ProjectName}" iconName="standard:account" >
+        
+        <aura:set attribute="actions">
+            <lightning:button label="Delete" onclick="{!c.delet}"/>
+        </aura:set>
+        <lightning:tabset>
+            {!v.error}
+            <lightning:tab label="General Info" id="one">
+            <lightning:layout verticalAlign="center" >
+                <!-- Show important information in huge font-->
+                <lightning:layoutItem padding="around-small" size="4">
+                    <div class="header-column" style="text-align: center">
+                        <p class="field-title" title="Field2">Tasks Completed
+                        </p>
+                        <p class="slds-text-heading_medium">{!v.incompleteTasks.length}\{!v.Tasks.length} Tasks</p>
+                    </div>
+                </lightning:layoutItem>
+                
+                <lightning:layoutItem padding="around-small" size="4">
+                    <div class="header-column" style="text-align: center">
+                        <p class="field-title" title="Field 3">Start Date</p>
+                        <p class="slds-text-heading_medium">
+                            <lightning:formattedDateTime value="{!v.SDate}" year="numeric" day="2-digit" month="long" hour="2-digit" minute="2-digit"/>
+						</p>
+                    </div>
+                </lightning:layoutItem>
+                
+                <lightning:layoutItem padding="around-small" size="4">
+                    <div class="header-column" style="text-align: center">
+                        <p class="field-title" title="Field 4">Due Date</p>
+                        <p class="slds-text-heading_medium">
+                            <lightning:formattedDateTime value="{!v.EDate}" year="numeric" day="2-digit" month="long" hour="2-digit" minute="2-digit"/>
+						</p>
+                    </div>
+                </lightning:layoutItem>
+                
+            </lightning:layout>
+            
+            <div style="margin-left: 10px; margin-top: 10px; margin-right: 10px" onmouseenter="{!c.hover}">
+                <p>Participants: </p>
+                <c:Participants recordId="{!v.RecordId}" Tasks="{!v.Tasks}"></c:Participants>
+            </div>
+            
+            </lightning:tab>
+            
+            <lightning:tab label="Client" id="two">
+                <c:Client RecordId="{!v.RecordId}" parent="{!this}"/><!-- Show Client info -->
+            </lightning:tab>
+            
+            <lightning:tab label="Cost Est" id="three">
+                <div style="margin-left:10px;margin-right:10px">
+                    <!-- Cost of participants' salary-->
+                    <div style="font-weight: bold;background-color:'lightBlue'">Participants</div>
+                    
+                    <aura:iteration items="{!v.participants}" var="par">
+                        <lightning:recordEditForm recordId="{!par.Id}" objectApiName="Participant__c" aura:id="editForm">
+                            <lightning:layout>
+                                <lightning:layoutItem padding="around-small">
+                                	{!par.User__r.Name}: 
+                                </lightning:layoutItem>
+                                <lightning:layoutItem padding="around-small">
+                                    <lightning:inputfield aura:id="{!par.Id}" fieldName="Salary__c" variant="label-hidden"/>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem padding="around-small">
+                                	<lightning:button variant="brand" name="save" type="submit" label="Save"/> 
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:recordEditForm>
+                    </aura:iteration>
+                    
+                    <div style="font-weight: bold;background-color:'lightBlue'">Others</div>
+                    <!--Costs of project cost-->
+                    <aura:iteration items="{!v.Costs}" var="cost">
+                        <lightning:recordEditForm recordId="{!cost.Id}" objectApiName="Project_Cost__c" aura:id="editForm">
+                            <lightning:layout>
+                                <lightning:layoutItem padding="around-small">
+                                	{!cost.Name}: 
+                                </lightning:layoutItem>
+                                <lightning:layoutItem padding="around-small">
+                                    <lightning:inputfield aura:id="{!cost.Id}" fieldName="Price__c" variant="label-hidden"/>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem padding="around-small">
+                                	<lightning:button variant="brand" name="save2" type="submit" label="Save"/> 
+                                </lightning:layoutItem>
+                                <lightning:layoutItem>
+                            		<a href="{!'/'+cost.Id}">more>></a><!-- To record page-->
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:recordEditForm>
+                    </aura:iteration>
+                    
+                    <!-- Add a new cost -->
+                    <lightning:button variant="Brand" label="Add Item" onclick="{!c.addNewPrice}"/>
+                    
+                </div>
+                
+                
+            </lightning:tab>
+            
+            <lightning:tab label="Files" id="four">
+                <div style="margin-left:10px">
+                <span class="text-blue">
+                    {!v.file}
+                	<aura:iteration items="{!v.ContentDocuments}" var="doc">
+                            <lightning:fileCard fileId="{!doc.Id}"/>
+                	</aura:iteration>
+                </span>
+                    <!-- Only take pdf, png and zip -->
+            		<lightning:fileUpload   label="Attach file (pdf, png, zip)"
+                                            name="fileUploader"
+                                            multiple="true"
+                                            accept=".pdf, .png, .zip"
+                                            recordId="{!v.RecordId}"
+                                            onuploadfinished="{!c.handleUploadFinished}" />
+                </div>
+            </lightning:tab>
+            
+            <lightning:tab label="{!'Overdue Tasks'}" id="five">
+                <!-- show list of overdue tasks-->
+                <div style="margin-left:10px">
+                <aura:if isTrue="{!v.overdueTasks.length == 0}">
+                    - This project doesn't have any overdue tasks
+                    <aura:set attribute="else">
+                        <aura:iteration items="{!v.overdueTasks}" var="overdue">
+                            <div style="{font-weight: bold}">
+                                - Task Name: {!overdue.Name}<br/>
+                            </div>
+                            + Participant: {!overdue.Participant__r.User__r.Name}<br/>
+                            + Due Date: {!overdue.End_Date__c}<br/>
+                            + Description: {!overdue.Description__c}<br/>
+                        </aura:iteration>
+                    </aura:set>
+                </aura:if>
+                </div>
+            </lightning:tab>
+            
+        </lightning:tabset>
+    </lightning:card>
+    
+</aura:component>

@@ -1,0 +1,1 @@
+Your task {!Task__c.Name} is reaching it's due date in 24 hours, if the task's status is not set to 'Completed' by then, it would be set to 'Overdue'.
