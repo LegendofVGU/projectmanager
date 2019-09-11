@@ -14,7 +14,7 @@ Step 5: Assign the permission set to the current user: sfdx force:user:permset:a
 
 Step 6: Open the scratch org: sfdx force:org:open
 
-Step 7: Launch the application from the app selection on the top of the Lightning Experience page.
+Step 7: Launch the application "Project Manager" from the app selection on the top of the Lightning Experience page.
 
 -----------
 Notes: 
