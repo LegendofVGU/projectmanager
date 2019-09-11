@@ -13,6 +13,9 @@ Step 4: Push code to scratch org: sfdx force:source:push
 Step 5: Assign the permission set to the current user: sfdx force:user:permset:assign -n projectmanager
 
 Step 6: Open the scratch org: sfdx force:org:open
+
+Step 7: Launch the application from the app selection on the top of the Lightning Experience page.
+
 -----------
 Notes: 
 + The application is not available in Salesforce Classic. In the first time logging in to the Salesforce dx account, the user should change press "Switch to the Lightning Experience" immediately if they are in Salesforce Classic.
