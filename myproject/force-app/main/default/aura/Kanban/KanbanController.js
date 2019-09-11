@@ -9,8 +9,9 @@
     drag: function (component, event, helper) {
         event.dataTransfer.setData("text", event.target.id);//data named text
     },
-    drop: function (component, event, helper) {
+    drop: function (component, event, helper) {//set task status after dropping
         event.preventDefault();
+        component.set('v.error','');//Delete error message
         var data = event.dataTransfer.getData("text");
         var tar = event.target;
         while(tar.tagName != 'ul' && tar.tagName != 'UL')

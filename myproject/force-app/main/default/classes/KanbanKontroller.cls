@@ -9,7 +9,12 @@ public class KanbanKontroller {
         Id daId = Id.valueOf(TaskId);
         Task__c tasktoUpdate = [SELECT Id, Status__c FROM Task__c WHERE Id = :daId];
         tasktoUpdate.Status__c = taskdesc;
-        update tasktoUpdate;
+        try{
+        	update tasktoUpdate;
+        }
+        catch(Exception e){
+            throw new AuraHandledException(e.getMessage());
+        }
     }
     
     @AuraEnabled

@@ -11,6 +11,8 @@
     <aura:attribute name="isModalOpen" type="boolean" default="false"/>
     <aura:attribute name="relatedFollowups" type="Task_Followup__c[]"/><!-- List of all followups-->
     
+    <aura:attribute name="error" type="String"/>
+    
     <!-- For child components to call -->
     <aura:method name="refresh" action="{!c.doInit}"/>
     
@@ -68,7 +70,7 @@
                                 Follow up tasks:
                             </div>
                                 <aura:iteration items="{!v.relatedFollowups}" var="followup">
-                                    {!followup.Name} - <a href="{'/'+followup.Id}">more</a><br/>
+                                    {!followup.Name} - <a href="{!'/'+followup.Id}">more</a><br/>
                                     <!-- Link to record's page = / + recordid -->
                                 </aura:iteration>
                                 <lightning:button variant="neutral"
@@ -102,6 +104,10 @@
     <lightning:card class="card slds-scrollable_x">
         <lightning:tabset>
             <lightning:tab label="Kanban" id="one">
+            <div style="color:red">
+            	{!v.error}    
+            </div>    
+                
             <div style="padding:0.5rem;">
                 <lightning:layout>
                 <aura:iteration var="pickVal" items="{!v.Status}" indexVar="Idx">
